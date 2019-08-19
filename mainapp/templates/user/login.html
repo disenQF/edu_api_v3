@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Title</title>
+</head>
+<body>
+  <h1> 用户登录页面</h1>
+  <h3> {{ base_url }}</h3>
+  <ul>
+      {% for key, value in cookies.items() %}
+            <li>{{ key }}: {{ value }} </li>
+      {% endfor %}
+  </ul>
+</body>
+</html>
