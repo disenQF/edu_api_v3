@@ -6,7 +6,7 @@ from sqlalchemy import Integer, String
 from models import db
 
 # 模型之间的关系不需要创建第三个模型类来实现第三张关系表创建
-# 创建用户和角色的关系表
+# 创建用户和 角色的关系表
 user_role = db.Table('user_role',
                      Column('user_id', Integer, ForeignKey('user.id', name='user_role_fk')),
                      Column('role_id', Integer, ForeignKey('role.id', name='user_role_pk')))

@@ -4,15 +4,39 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Title</title>
+    <title>Login</title>
 </head>
 <body>
   <h1> 用户登录页面</h1>
-  <h3> {{ base_url }}</h3>
-  <ul>
-      {% for key, value in cookies.items() %}
-            <li>{{ key }}: {{ value }} </li>
-      {% endfor %}
-  </ul>
+  <form name="login_form" action="/user/login" method="post">
+      <input name="phone" placeholder="手机号"><br>
+      <input type="password" name="passwd" placeholder="口令"><br>
+      <button>登录</button> <a href="#">没有账号则先去注册</a>
+  </form>
+  <div id="val_info" style="color:red">
+      {{ msg }}
+  </div>
+ <script>
+     function $(id) {
+         return document.getElementById(id);
+     }
+
+     // 设置表单提交函数
+
+     document.forms[0].onsubmit =function(ev){
+         if(! /\d{11}/.test(this.phone.value)){
+             $('val_info').innerHTML = '手机号必须是11位';
+             return false
+         }
+
+          if(! /\w{6,}/.test(this.passwd.value)){
+             console.log(this.passwd.value);
+             $('val_info').innerHTML = '口令是包含数字和字母的至少6位的字符串';
+             return false
+         }
+
+          $('val_info').innerHTML = ''
+     }
+ </script>
 </body>
 </html>
