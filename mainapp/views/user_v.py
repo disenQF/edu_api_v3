@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime, timedelta
 
 import os
-from flask import Blueprint, make_response, redirect
+from flask import Blueprint, make_response, redirect, jsonify
 from flask import request, render_template
 from werkzeug.datastructures import FileStorage
 
@@ -22,7 +22,7 @@ def modify():
     token = request.cookies.get('token')
     user_id = cache.get_user_id(token)
 
-    # 任务1： 优化登录用户的相关信息存在redis中(缓存)
+    # 任务2： 优化登录用户的相关信息存在redis中(缓存)
     user = User.query.get(int(user_id))
 
     msg = ''
@@ -50,11 +50,32 @@ def modify():
             user.photo = 'user/'+filename
             db.session.commit()
 
-
     return render_template('user/info.html',
                            user=user,
                            msg=msg)
 
+
+@blue.route('/upload', methods=['POST'])
+def upload_photo():
+    upload_file: FileStorage = request.files.get('photo')
+
+    filename = uuid.uuid4().hex+os.path.splitext(upload_file.filename)[-1]
+    filepath = os.path.join(settings.USER_DIR, filename)
+
+    upload_file.save(filepath)
+
+    user = User.query.get(cache.get_user_id(request.cookies.get('token')))
+    # 任务1： 删除之前的用户头像
+
+    user.photo='user/'+filename;
+    db.session.commit()
+
+    # ? 图片如何压缩- PIL(pip install pillow)
+
+    return jsonify({
+        'msg': '上传成功',
+        'path': 'user/'+filename
+    })
 
 @blue.route('/logout', methods=['GET'])
 def logout():
@@ -68,7 +89,6 @@ def logout():
     resp.delete_cookie('token')
 
     return resp
-
 
 
 @blue.route('/login', methods=['GET', 'POST'])
