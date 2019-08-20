@@ -47,7 +47,7 @@ def modify():
 
             # 更新用户信息
             # 保存在数据库的图片是相对static资源访问的路径
-            user.photo = 'user/'+filename
+            user.photo = 'user/' + filename
             db.session.commit()
 
     return render_template('user/info.html',
@@ -59,7 +59,7 @@ def modify():
 def upload_photo():
     upload_file: FileStorage = request.files.get('photo')
 
-    filename = uuid.uuid4().hex+os.path.splitext(upload_file.filename)[-1]
+    filename = uuid.uuid4().hex + os.path.splitext(upload_file.filename)[-1]
     filepath = os.path.join(settings.USER_DIR, filename)
 
     upload_file.save(filepath)
@@ -67,19 +67,19 @@ def upload_photo():
     user = User.query.get(cache.get_user_id(request.cookies.get('token')))
     # 任务1： 删除之前的用户头像
 
-    user.photo='user/'+filename;
+    user.photo = 'user/' + filename;
     db.session.commit()
 
     # ? 图片如何压缩- PIL(pip install pillow)
 
     return jsonify({
         'msg': '上传成功',
-        'path': 'user/'+filename
+        'path': 'user/' + filename
     })
+
 
 @blue.route('/logout', methods=['GET'])
 def logout():
-
     # 删除redis中token
     token = request.cookies.get('token')
     cache.clear_token(token)
@@ -105,7 +105,7 @@ def login():
             # 生成token
             token = uuid.uuid4().hex
             resp = redirect('/')
-            resp.set_cookie('token', token, expires=(datetime.now()+timedelta(days=3)))
+            resp.set_cookie('token', token, expires=(datetime.now() + timedelta(days=3)))
 
             # 将token添加到redis, token-user_id
             cache.save_token(token, login_user.id)
