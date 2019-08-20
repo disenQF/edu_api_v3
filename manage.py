@@ -3,7 +3,7 @@
 from flask import render_template, request, redirect, url_for
 
 from mainapp import app
-from mainapp.views import user_v
+from mainapp.views import user_v, logger_v
 from flask_script import Manager
 from models.user import db, User
 from utils import cache
@@ -11,7 +11,9 @@ from utils import cache
 
 @app.before_request
 def check_login():
-    if request.path != '/user/login':
+    app.logger.info(request.path+'被访问了')
+    if request.path not in ['/user/login',
+                             '/log']:
 
         # 判断request中是否包含token
         # 验证token是否有效
@@ -49,6 +51,7 @@ def drop_database():
 if __name__ == '__main__':
     # 将蓝图注册到app中
     app.register_blueprint(user_v.blue, url_prefix='/user')
+    app.register_blueprint(logger_v.blue)
 
     # 初始化数据库
     db.init_app(app)
