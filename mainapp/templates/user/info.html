@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{{ user.nick_name }}的个人中心</title>
+</head>
+<body>
+<h3>修改{{ user.phone }}用户的头像</h3>
+<p>
+    <img src="/static/{% if user.photo %}{{ user.photo }}{% else %}images/default_img.png{% endif %}"
+         width="100"
+         height="100">
+</p>
+<!-- 如果form表单请求的路径是当前url路径,可以省略 action -->
+<form method="post" enctype="multipart/form-data">
+    <input name="user_photo" type="file">
+    <button>开始上传头像</button>
+</form>
+<p style="color:red;">
+    {{ msg }}
+</p>
+</body>
+</html>

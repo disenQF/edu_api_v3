@@ -3,12 +3,57 @@
 import uuid
 from datetime import datetime, timedelta
 
+import os
 from flask import Blueprint, make_response, redirect
 from flask import request, render_template
-from models.user import User
+from werkzeug.datastructures import FileStorage
+
+import settings
+from models.user import User, db
 from utils import crypt, cache
 
 blue = Blueprint('userBlue', __name__)
+
+
+@blue.route('/modify', methods=['GET', 'POST'])
+def modify():
+    # print('request-method: ', request.method)
+
+    token = request.cookies.get('token')
+    user_id = cache.get_user_id(token)
+
+    # 任务1： 优化登录用户的相关信息存在redis中(缓存)
+    user = User.query.get(int(user_id))
+
+    msg = ''
+    if request.method == 'POST':
+        # 头像上传
+        # 获取上传的文件
+        # user_photo必须和前端请求中文件字段名保持一致
+        upload_file: FileStorage = request.files.get('user_photo')
+        print('文件名： ', upload_file.filename)
+        # print('文件长度（字节）： ', upload_file.content_length)
+        print('文件类型： ', upload_file.content_type)
+        # 验证文件是否为图片
+        if not upload_file.content_type.startswith('image/'):
+            msg = '只支持图片上传'
+        else:
+            # 保存图片
+            filename = uuid.uuid4().hex + os.path.splitext(upload_file.filename)[-1]
+            filepath = os.path.join(settings.USER_DIR, filename)
+
+            # 服务端保存上传的文件
+            upload_file.save(filepath)
+
+            # 更新用户信息
+            # 保存在数据库的图片是相对static资源访问的路径
+            user.photo = 'user/'+filename
+            db.session.commit()
+
+
+    return render_template('user/info.html',
+                           user=user,
+                           msg=msg)
 
 
 @blue.route('/logout', methods=['GET'])
